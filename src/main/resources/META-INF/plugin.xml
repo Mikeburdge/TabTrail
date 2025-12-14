@@ -10,6 +10,6 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow factoryClass="com.github.mikeburdge.tabtrail.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <postStartupActivity implementation="com.github.mikeburdge.tabtrail.startup.MyProjectActivity" />
+        <postStartupActivity implementation="com.github.mikeburdge.tabtrail.startup.TabTrailStartupActivity" />
     </extensions>
 </idea-plugin>
