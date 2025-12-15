@@ -1,6 +1,6 @@
 package com.github.mikeburdge.tabtrail.data
 
-data class HistoryEntry(
+data class TTHistoryEntry(
     val fileUrl: String,
     var lastAccessedMs: Long,
     var lastCaretOffset: Int?

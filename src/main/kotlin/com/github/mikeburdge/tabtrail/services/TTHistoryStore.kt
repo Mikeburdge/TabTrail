@@ -1,11 +1,11 @@
 package com.github.mikeburdge.tabtrail.services
 
-import com.github.mikeburdge.tabtrail.data.HistoryEntry
+import com.github.mikeburdge.tabtrail.data.TTHistoryEntry
 import com.intellij.openapi.components.Service
 
 @Service(Service.Level.PROJECT)
-class HistoryStore {
-    private val entries = mutableListOf<HistoryEntry>()
+class TTHistoryStore {
+    private val entries = mutableListOf<TTHistoryEntry>()
 
     private val maxEntries: Int = 10
 
@@ -14,7 +14,7 @@ class HistoryStore {
         val index = entries.indexOfFirst { it.fileUrl == fileUrl }
 
         if (index >= 0) {
-            val currentEntry: HistoryEntry = entries[index]
+            val currentEntry: TTHistoryEntry = entries[index]
 
             entries.removeAt(index)
 
@@ -24,7 +24,7 @@ class HistoryStore {
             entries.addFirst(currentEntry)
         }
         else {
-            entries.addFirst(HistoryEntry(fileUrl, now, caretOffset))
+            entries.addFirst(TTHistoryEntry(fileUrl, now, caretOffset))
         }
 
         while (entries.size > maxEntries) {
