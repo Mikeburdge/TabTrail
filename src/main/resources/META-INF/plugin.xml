@@ -9,7 +9,7 @@
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.mikeburdge.tabtrail.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+        <toolWindow factoryClass="com.github.mikeburdge.tabtrail.toolWindow.TTHistoryWindow" id="MyToolWindow"/>
         <postStartupActivity implementation="com.github.mikeburdge.tabtrail.startup.TTStartupActivity" />
     </extensions>
 </idea-plugin>
