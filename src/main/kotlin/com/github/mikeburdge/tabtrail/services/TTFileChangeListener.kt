@@ -13,7 +13,7 @@ class TTFileChangeListener(private val project: Project, private val TTHistorySt
 
         val url: String = currentFile.url
 
-        TTHistoryStore.recordAccess(url, null)
+        TTHistoryStore.recordAccess(url)
 
         project.messageBus.syncPublisher(TT_HISTORY_CHANGE_TOPIC).historyChanged()
 
