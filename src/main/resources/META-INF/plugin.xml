@@ -11,5 +11,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow factoryClass="com.github.mikeburdge.tabtrail.toolWindow.TTHistoryWindow" id="MyToolWindow"/>
         <postStartupActivity implementation="com.github.mikeburdge.tabtrail.startup.TTStartupActivity" />
+        <notificationGroup id="TabTrail"
+                           displayType="BALLOON"/>
     </extensions>
 </idea-plugin>

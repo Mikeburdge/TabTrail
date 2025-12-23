@@ -4,6 +4,8 @@ import com.github.mikeburdge.tabtrail.data.TTHistoryEntry
 import com.github.mikeburdge.tabtrail.events.TTHistoryChangedListener
 import com.github.mikeburdge.tabtrail.events.TT_HISTORY_CHANGE_TOPIC
 import com.github.mikeburdge.tabtrail.services.TTHistoryStore
+import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -19,6 +21,8 @@ import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.content.ContentFactory
 import java.awt.BorderLayout
+import java.awt.event.ActionEvent
+import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.*
@@ -75,11 +79,21 @@ class TTHistoryWindow : ToolWindowFactory, DumbAware {
                 ApplicationManager.getApplication().invokeLater { refresh() }
             })
 
+
+
+            list.getInputMap(JComponent.WHEN_FOCUSED)
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "ttOpenSelected")
+
+            list.actionMap.put("ttOpenSelected", object : AbstractAction() {
+                override fun actionPerformed(e: ActionEvent?) {
+                    openSelectedEntry()
+                }
+            })
+
             list.addMouseListener(object : MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent) {
                     if (e.clickCount != 2) return
-                    val selected = list.selectedValue ?: return
-                    openEntry(selected)
+                    openSelectedEntry()
                 }
             })
 
@@ -90,6 +104,11 @@ class TTHistoryWindow : ToolWindowFactory, DumbAware {
             }
 
             refresh()
+        }
+
+        private fun openSelectedEntry() {
+            val selected = list.selectedValue ?: return
+            openEntry(selected)
         }
 
         private fun refresh() {
@@ -117,6 +136,12 @@ class TTHistoryWindow : ToolWindowFactory, DumbAware {
         private fun openEntry(entry: TTHistoryEntry) {
             val vFile = VirtualFileManager.getInstance().findFileByUrl(entry.fileUrl)
             if (vFile == null) {
+                val group = NotificationGroupManager.getInstance().getNotificationGroup("TabTrail")
+                group.createNotification(
+                    "TabTrail: Cannnot find file ",
+                    "could not open ${entry.fileUrl}",
+                    NotificationType.WARNING
+                )
                 return
             }
 
