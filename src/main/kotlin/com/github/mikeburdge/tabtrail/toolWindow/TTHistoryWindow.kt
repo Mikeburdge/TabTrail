@@ -132,7 +132,7 @@ class TTHistoryWindow : ToolWindowFactory, DumbAware {
                     "TabTrail: Cannnot find file ",
                     "could not open ${entry.fileUrl}",
                     NotificationType.WARNING
-                )
+                ).notify(project)
                 return
             }
 
