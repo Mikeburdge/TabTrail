@@ -1,6 +1,9 @@
 package com.github.mikeburdge.tabtrail.toolWindow
 
+import com.github.mikeburdge.tabtrail.events.TTHistoryChangedListener
+import com.github.mikeburdge.tabtrail.events.TT_HISTORY_CHANGE_TOPIC
 import com.github.mikeburdge.tabtrail.services.TTHistoryStore
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.DumbAware
@@ -50,6 +53,10 @@ class TTHistoryWindow : ToolWindowFactory, DumbAware {
 
 
         init {
+            project.messageBus.connect(project).subscribe(TT_HISTORY_CHANGE_TOPIC, TTHistoryChangedListener {
+                ApplicationManager.getApplication().invokeLater { refresh() }
+            })
+
             // hook the UI Events
             refreshButton.addActionListener {
                 refresh()

@@ -12,7 +12,7 @@ class TTStartupActivity : StartupActivity {
 
     override fun runActivity(project: Project) {
         val TTHistoryStore = project.service<TTHistoryStore>()
-        val TTFileChangeListener = TTFileChangeListener(TTHistoryStore)
+        val TTFileChangeListener = TTFileChangeListener(project, TTHistoryStore)
 
         project.messageBus.connect(project).subscribe(
             FileEditorManagerListener.FILE_EDITOR_MANAGER, TTFileChangeListener)
