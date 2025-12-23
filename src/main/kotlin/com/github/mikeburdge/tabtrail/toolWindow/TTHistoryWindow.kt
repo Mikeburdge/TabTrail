@@ -62,13 +62,10 @@ class TTHistoryWindow : ToolWindowFactory, DumbAware {
             }
         }
 
-        private val refreshButton = JButton("Refresh")
 
         val component: JComponent = JPanel(BorderLayout()).apply {
             val topBar = JPanel(BorderLayout()).apply {
-                add(refreshButton, BorderLayout.WEST)
             }
-
             add(topBar, BorderLayout.NORTH)
             add(JBScrollPane(list), BorderLayout.CENTER)
         }
@@ -96,12 +93,6 @@ class TTHistoryWindow : ToolWindowFactory, DumbAware {
                     openSelectedEntry()
                 }
             })
-
-
-            // hook the UI Events
-            refreshButton.addActionListener {
-                refresh()
-            }
 
             refresh()
         }
