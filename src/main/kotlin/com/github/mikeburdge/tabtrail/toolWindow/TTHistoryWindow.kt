@@ -1,23 +1,27 @@
 package com.github.mikeburdge.tabtrail.toolWindow
 
+import com.github.mikeburdge.tabtrail.data.TTHistoryEntry
 import com.github.mikeburdge.tabtrail.events.TTHistoryChangedListener
 import com.github.mikeburdge.tabtrail.events.TT_HISTORY_CHANGE_TOPIC
 import com.github.mikeburdge.tabtrail.services.TTHistoryStore
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
+import com.intellij.ui.ColoredListCellRenderer
+import com.intellij.ui.SimpleTextAttributes
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.content.ContentFactory
 import java.awt.BorderLayout
-import javax.swing.DefaultListModel
-import javax.swing.JButton
-import javax.swing.JComponent
-import javax.swing.JPanel
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import javax.swing.*
 
 class TTHistoryWindow : ToolWindowFactory, DumbAware {
 
@@ -33,12 +37,26 @@ class TTHistoryWindow : ToolWindowFactory, DumbAware {
 
     override fun shouldBeAvailable(project: Project) = true
 
-    class RecentFilesPanel(project: Project) {
+    class RecentFilesPanel(val project: Project) {
 
         private val store: TTHistoryStore = project.service()
 
-        private val model = DefaultListModel<String>()
-        private val list = JBList(model)
+        private val model = DefaultListModel<TTHistoryEntry>()
+
+        private val list = JBList(model).apply {
+            this.cellRenderer = object : ColoredListCellRenderer<TTHistoryEntry>() {
+                override fun customizeCellRenderer(
+                    list: JList<out TTHistoryEntry>,
+                    value: TTHistoryEntry?,
+                    index: Int,
+                    selected: Boolean,
+                    hasFocus: Boolean
+                ) {
+                    if (value == null) return
+                    append(formatEntry(value.fileUrl), SimpleTextAttributes.REGULAR_ATTRIBUTES)
+                }
+            }
+        }
 
         private val refreshButton = JButton("Refresh")
 
@@ -57,6 +75,15 @@ class TTHistoryWindow : ToolWindowFactory, DumbAware {
                 ApplicationManager.getApplication().invokeLater { refresh() }
             })
 
+            list.addMouseListener(object : MouseAdapter() {
+                override fun mouseClicked(e: MouseEvent) {
+                    if (e.clickCount != 2) return
+                    val selected = list.selectedValue ?: return
+                    openEntry(selected)
+                }
+            })
+
+
             // hook the UI Events
             refreshButton.addActionListener {
                 refresh()
@@ -72,7 +99,7 @@ class TTHistoryWindow : ToolWindowFactory, DumbAware {
             val entries = store.getEntries()
 
             for (entry in entries) {
-                model.addElement(formatEntry(entry.fileUrl))
+                model.addElement(entry)
             }
 
         }
@@ -86,6 +113,15 @@ class TTHistoryWindow : ToolWindowFactory, DumbAware {
                     )
         }
 
+
+        private fun openEntry(entry: TTHistoryEntry) {
+            val vFile = VirtualFileManager.getInstance().findFileByUrl(entry.fileUrl)
+            if (vFile == null) {
+                return
+            }
+
+            OpenFileDescriptor(project, vFile).navigate(true)
+        }
 
     }
 }
